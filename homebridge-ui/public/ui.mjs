@@ -3,6 +3,7 @@ import { FeatureOptions, scopeSafeId } from "homebridge-plugin-utils/featureOpti
 import { HOST_PATTERN, ID_PATTERN, probeErrorKey, probeSettings, validateSettings } from "./settings-model.mjs";
 import { messages, selectLanguage } from "./i18n.mjs";
 const app = document.getElementById("controlApp");
+
 // Retire listeners from the previous settings implementation as well as a reused native page.
 globalThis.webUiPageEpoch?.abort();
 const previous = globalThis.sonyControlEpoch;
