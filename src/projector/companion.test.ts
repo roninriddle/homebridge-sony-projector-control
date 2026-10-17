@@ -201,7 +201,8 @@ describe("CompanionAccessory", () => {
 
     const { Characteristic, bySubtype, controller, fake } = await rig([ "Enable.Controls.Brightness", "Enable.Controls.Contrast" ]);
 
-    await waitUntil(() => controller.store.get("observedPower") === "standby", { description: "observed standby", timeoutMs: 2000 });
+    await waitUntil(() => (controller.store.get("observedPower") === "standby") && !!bySubtype("advanced.brightness"),
+      { description: "observed standby and advanced service discovery", timeoutMs: 2000 });
     const brightness = bySubtype("advanced.brightness")!.getCharacteristic(Characteristic.Brightness);
     const on = bySubtype("advanced.brightness")!.getCharacteristic(Characteristic.On);
 

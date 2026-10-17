@@ -583,7 +583,8 @@ function renderFeatures(body) {
 
     const section = node("details", undefined, "spj-section spj-feature-group");
     const title = messages[language].categories[category.name];
-    const enabled = (catalog.options[category.name] || []).filter(option => engine.test(engine.expandOption(category.name, option.name), scope || undefined));
+    const enabled = (catalog.options[category.name] || []).filter(option => ((category.name !== "Remote") || engine.test("Remote", scope ||
+      undefined)) && engine.test(engine.expandOption(category.name, option.name), scope || undefined));
 
     section.open = openCategories.has(category.name);
     section.append(node("summary", title + " · " + enabled.length + "/" + (catalog.options[category.name] || []).length));
