@@ -1,0 +1,22 @@
+{
+  "platform": "SonyProjectorUnified",
+  "name": "Sony Projector Unified",
+  "projectors": [
+    {
+      "id": "theater-hw69",
+      "name": "HW69",
+      "host": "192.0.2.10",
+      "username": "root",
+      "password": "Projector",
+      "protocol": "adcp",
+      "pollInterval": 10,
+      "autoPowerOn": false,
+      "language": "zh-CN"
+    }
+  ],
+  "options": [
+    "Enable.Sensors.Warming",
+    "Enable.Sensors.Ready",
+    "Enable.Sensors.Cooling"
+  ]
+}

@@ -1,0 +1,18 @@
+node_modules/
+dist/
+homebridge-ui/public/lib/
+coverage/
+*.tgz
+.DS_Store
+test/hbConfig/*
+!test/hbConfig/config.json
+
+.local/
+artifacts/
+
+.env*
+*.log
+# Private deployment records are maintained outside the public export.
+WORK_STATUS.md
+TEST_REPORT.md
+VW598_ACCEPTANCE.md

@@ -1,0 +1,209 @@
+/* tv.test.ts: The Television accessory against a real HAP stack, a real controller and the fake projector. */
+import { CLOSED_PORT, startFakeAdcp } from "../protocol/fake-adcp.helpers.ts";
+import { Categories, FeatureOptions, HAPStatus } from "homebridge-plugin-utils";
+import { after, describe, test } from "node:test";
+import { capturingLog, waitUntil } from "homebridge-plugin-utils/testing";
+import { featureOptionCategories, featureOptions } from "../options.ts";
+import type { FakeAdcpOptions } from "../protocol/fake-adcp.helpers.ts";
+import type { FakeApi } from "../fake-api.helpers.ts";
+import { ProjectorCache } from "./cache.ts";
+import type { ProjectorConfig } from "../config.ts";
+import { ProjectorController } from "./controller.ts";
+import { TelevisionAccessory } from "./tv.ts";
+import assert from "node:assert/strict";
+import { createFakeApi } from "../fake-api.helpers.ts";
+
+const TIMINGS = { authPauseMs: 100, backoffCeilingMs: 50, faultsEveryMs: 0, lightHoursEveryMs: 0, pollMs: 30, standbyPollMs: 30, transitionPollMs: 20 };
+const cleanups: (() => unknown)[] = [];
+
+after(async () => Promise.all(cleanups.map(async (cleanup) => cleanup())));
+
+interface Rig {
+
+  fake: Awaited<ReturnType<typeof startFakeAdcp>> | null;
+  controller: ProjectorController;
+  fakeApi: FakeApi;
+  log: ReturnType<typeof capturingLog>;
+  tv: TelevisionAccessory;
+}
+
+async function rig({ configured = [], fakeOptions = {}, overrides = {}, unreachable = false }: {
+  configured?: string[]; fakeOptions?: FakeAdcpOptions; overrides?: Partial<ProjectorConfig>; unreachable?: boolean; } =
+  {}): Promise<Rig> {
+
+  const fake = unreachable ? null : await startFakeAdcp({ transitionMs: 40, ...fakeOptions });
+  const port = fake?.port ?? CLOSED_PORT;
+
+  const fakeApi = createFakeApi();
+  const abort = new AbortController();
+  const log = capturingLog();
+  const options = new FeatureOptions(featureOptionCategories, featureOptions, configured);
+  const config: ProjectorConfig = { adcpPort: port, community: "SONY", host: "127.0.0.1", id: "127-0-0-1", name: "Theater", password: "", pollIntervalSeconds: 10,
+    protocol: "adcp", sdcpPort: 1, ...overrides };
+  const controller = new ProjectorController({ config, isEnabled: (option) => options.test(option, config.id), log, pacingMs: 0, signal: abort.signal,
+    timings: TIMINGS });
+  const context = { api: fakeApi.api, cache: new ProjectorCache(fakeApi.storagePath, log), config, controller,
+    enabled: (option: string) => options.test(option, config.id), log, value: (option: string) => options.value(option, config.id) };
+  const tv = new TelevisionAccessory(context);
+
+  cleanups.push(() => abort.abort(), () => fakeApi.cleanup(), async () => fake?.close());
+  controller.start();
+
+  return { controller, fake, fakeApi, log, tv };
+}
+
+describe("TelevisionAccessory", () => {
+
+  test("is a Television with information, inputs linked to it, and a remote", async () => {
+
+    const { fakeApi, tv } = await rig();
+    const { Characteristic, Service } = fakeApi.api.hap;
+    const television = tv.accessory.getService(Service.Television)!;
+    const inputs = tv.accessory.services.filter((service) => service.UUID === Service.InputSource.UUID);
+
+    assert.equal(tv.accessory.category, Categories.TELEVISION);
+    assert.equal(tv.accessory.getService(Service.AccessoryInformation)?.getCharacteristic(Characteristic.Manufacturer).value, "Sony");
+    assert.equal(television.getCharacteristic(Characteristic.ConfiguredName).value, "Theater");
+    assert.deepEqual(inputs.map((input) => input.getCharacteristic(Characteristic.ConfiguredName).value), [ "HDMI 1", "HDMI 2" ]);
+    assert.deepEqual(inputs.map((input) => input.getCharacteristic(Characteristic.Identifier).value), [ 1, 2 ]);
+    assert.equal(television.linkedServices.length, 2);
+  });
+
+  test("reads come from the cache and writes turn the projector on", async () => {
+
+    const { controller, fake, fakeApi, tv } = await rig();
+    const { Characteristic, Service } = fakeApi.api.hap;
+    const active = tv.accessory.getService(Service.Television)!.getCharacteristic(Characteristic.Active);
+
+    await waitUntil(() => controller.store.get("reachable"), { description: "reachable", timeoutMs: 2000 });
+    assert.equal(await active.handleGetRequest(), Characteristic.Active.INACTIVE);
+
+    await active.handleSetRequest(Characteristic.Active.ACTIVE);
+    assert.equal(fake!.state.power, "startup");
+    assert.equal(active.value, Characteristic.Active.ACTIVE);
+  });
+
+  test("an unreachable projector reads as No Response and rejects writes with a communication failure", async () => {
+
+    const { fakeApi, tv } = await rig({ unreachable: true });
+    const { Characteristic, Service } = fakeApi.api.hap;
+    const active = tv.accessory.getService(Service.Television)!.getCharacteristic(Characteristic.Active);
+    const isCommunicationFailure = (error: unknown): boolean => (error === HAPStatus.SERVICE_COMMUNICATION_FAILURE) ||
+      ((error as { hapStatus?: number }).hapStatus === HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+
+    await assert.rejects(active.handleGetRequest(), isCommunicationFailure);
+    await assert.rejects(active.handleSetRequest(Characteristic.Active.ACTIVE), isCommunicationFailure);
+  });
+
+  test("selecting an input switches the projector; external input changes move the tile", async () => {
+
+    const { controller, fake, fakeApi, tv } = await rig({ fakeOptions: { state: { power: "on" } } });
+    const { Characteristic, Service } = fakeApi.api.hap;
+    const identifier = tv.accessory.getService(Service.Television)!.getCharacteristic(Characteristic.ActiveIdentifier);
+
+    await waitUntil(() => controller.store.get("input") === "hdmi1", { description: "input known", timeoutMs: 2000 });
+    await identifier.handleSetRequest(2);
+    assert.equal(fake!.state.input, "hdmi2");
+
+    fake!.state.input = "hdmi1";
+    await waitUntil(() => identifier.value === 1, { description: "tile follows the projector", timeoutMs: 2000 });
+  });
+
+  test("Apple TV Remote buttons map to projector keys, and Play/Pause mutes the picture by default", async () => {
+
+    const { controller, fake, fakeApi, tv } = await rig({ fakeOptions: { state: { power: "on" } } });
+    const { Characteristic, Service } = fakeApi.api.hap;
+    const television = tv.accessory.getService(Service.Television)!;
+    const key = television.getCharacteristic(Characteristic.RemoteKey);
+
+    await waitUntil(() => controller.store.get("blank") === false, { description: "blank known", timeoutMs: 2000 });
+    await key.handleSetRequest(Characteristic.RemoteKey.ARROW_UP);
+    await key.handleSetRequest(Characteristic.RemoteKey.SELECT);
+    await key.handleSetRequest(Characteristic.RemoteKey.BACK);
+    await key.handleSetRequest(Characteristic.RemoteKey.INFORMATION);
+    await key.handleSetRequest(Characteristic.RemoteKey.PLAY_PAUSE);
+    await television.getCharacteristic(Characteristic.PowerModeSelection).handleSetRequest(Characteristic.PowerModeSelection.SHOW);
+
+    assert.deepEqual(fake!.state.keys, [ "up", "enter", "return", "menu", "menu" ]);
+    assert.equal(fake!.state.blank, "on");
+  });
+
+  test("remote buttons can be remapped or disabled with feature options", async () => {
+
+    const { controller, fake, fakeApi, tv } = await rig({ configured: [ "Enable.Remote.PlayPause=none", "Enable.Remote.Info=return", "Disable.Remote.Back" ],
+      fakeOptions: { state: { power: "on" } } });
+    const { Characteristic, Service } = fakeApi.api.hap;
+    const key = tv.accessory.getService(Service.Television)!.getCharacteristic(Characteristic.RemoteKey);
+
+    await waitUntil(() => controller.store.get("reachable"), { description: "reachable", timeoutMs: 2000 });
+    await key.handleSetRequest(Characteristic.RemoteKey.PLAY_PAUSE);
+    await key.handleSetRequest(Characteristic.RemoteKey.INFORMATION);
+    await key.handleSetRequest(Characteristic.RemoteKey.BACK);
+
+    // Info was remapped to return; Play/Pause and a disabled Back do nothing.
+    assert.deepEqual(fake!.state.keys, ["return"]);
+    assert.equal(fake!.state.blank, "off");
+  });
+
+  test("renaming the TV, or renaming or hiding an input, in the Home app is remembered", async () => {
+
+    const { fakeApi, tv } = await rig();
+    const { Characteristic, Service } = fakeApi.api.hap;
+    const hdmi2 = tv.accessory.services.find((service) => (service.UUID === Service.InputSource.UUID) && (service.subtype === "input.hdmi2"))!;
+
+    await hdmi2.getCharacteristic(Characteristic.ConfiguredName).handleSetRequest("Apple TV");
+    await hdmi2.getCharacteristic(Characteristic.TargetVisibilityState).handleSetRequest(Characteristic.TargetVisibilityState.HIDDEN);
+
+    assert.equal(hdmi2.getCharacteristic(Characteristic.CurrentVisibilityState).value, Characteristic.CurrentVisibilityState.HIDDEN);
+    await tv.accessory.getService(Service.Television)!.getCharacteristic(Characteristic.ConfiguredName).handleSetRequest("Cinema");
+
+    const cached = new ProjectorCache(fakeApi.storagePath, capturingLog()).get("127-0-0-1");
+
+    assert.deepEqual(cached.inputs, { hdmi2: { hidden: true, name: "Apple TV" } });
+    assert.equal(cached.name, "Cinema");
+    assert.equal(cached.advertisedName, "Theater");
+  });
+
+  test("legacy paired TV keeps its discovery name across config and Home app renames", async () => {
+
+    const fakeApi = createFakeApi();
+    const abort = new AbortController();
+    const log = capturingLog();
+    const cache = new ProjectorCache(fakeApi.storagePath, log);
+    const config: ProjectorConfig = { adcpPort: 53595, community: "SONY", host: "192.0.2.1", id: "theater", name: "HW69", password: "",
+      pollIntervalSeconds: 10, protocol: "adcp", sdcpPort: 53484 };
+    const controller = new ProjectorController({ config, isEnabled: () => false, log, signal: abort.signal });
+    const context = { api: fakeApi.api, cache, config, controller, enabled: (): boolean => false, log, value: (): undefined => undefined };
+
+    cleanups.push(() => abort.abort(), () => fakeApi.cleanup());
+    cache.update(config.id, { name: "HW69 Test" });
+    const first = new TelevisionAccessory(context);
+    const { Characteristic, Service } = fakeApi.api.hap;
+
+    assert.equal(first.accessory.displayName, "HW69 Test");
+    await first.accessory.getService(Service.Television)!.getCharacteristic(Characteristic.ConfiguredName).handleSetRequest("影院投影仪");
+    const second = new TelevisionAccessory({ ...context, cache: new ProjectorCache(fakeApi.storagePath, log), config: { ...config, name: "New Config Name" } });
+
+    assert.equal(second.accessory.displayName, "HW69 Test");
+    assert.equal(second.accessory.UUID, first.accessory.UUID);
+    assert.equal(second.accessory.getService(Service.Television)!.getCharacteristic(Characteristic.ConfiguredName).value, "影院投影仪");
+  });
+
+  test("picture modes can be the TV picker without changing physical HDMI", async () => {
+
+    const { controller, fake, fakeApi, tv } = await rig({ fakeOptions: { state: { power: "on" } }, overrides: { inputSource: "pictureModes" } });
+    const { Characteristic, Service } = fakeApi.api.hap;
+
+    await waitUntil(() => controller.store.get("pictureMode") === "cinema_film1", { description: "mode known", timeoutMs: 2000 });
+    const game = tv.accessory.services.find((service) => service.subtype === "input.game")!;
+    const identifier = game.getCharacteristic(Characteristic.Identifier).value;
+
+    assert.ok(typeof identifier === "number");
+
+    await tv.accessory.getService(Service.Television)!.getCharacteristic(Characteristic.ActiveIdentifier).handleSetRequest(identifier);
+    assert.equal(fake!.state.pictureMode, "game");
+    assert.equal(fake!.state.input, "hdmi1");
+    assert.ok(!fake!.received.some((line) => line.startsWith("power ")));
+  });
+
+});

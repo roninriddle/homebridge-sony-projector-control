@@ -1,0 +1,300 @@
+{
+  "pluginAlias": "SonyProjectorUnified",
+  "pluginType": "platform",
+  "singular": true,
+  "customUi": true,
+  "headerDisplay": "Sony Projector Unified / 索尼投影仪综合控制。支持 ADCP 和 PJ Talk。默认不自动开机，高级控制及投影就绪、冷却中传感器请在 Feature Options 按需开启。",
+  "footerDisplay": "Run this plugin as a [child bridge](https://github.com/homebridge/homebridge/wiki/Child-Bridges). Each projector appears as its own TV accessory: add it in the Home app with **Add Accessory > More options** and your Homebridge setup code.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Platform name",
+        "type": "string",
+        "default": "Sony Projectors"
+      },
+      "projectors": {
+        "title": "Projectors",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Name / 名称",
+              "type": "string",
+              "placeholder": "Projector",
+              "description": "How the projector is named in HomeKit."
+            },
+            "host": {
+              "title": "IP address or hostname / 地址",
+              "type": "string",
+              "placeholder": "192.168.1.50",
+              "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9.:-]{0,251}[A-Za-z0-9])?$",
+              "description": "Give the projector a fixed address (a DHCP reservation) so it does not change."
+            },
+            "protocol": {
+              "title": "Control protocol / 控制协议",
+              "type": "string",
+              "default": "auto",
+              "oneOf": [
+                {
+                  "title": "Automatic (recommended)",
+                  "enum": [
+                    "auto"
+                  ]
+                },
+                {
+                  "title": "ADCP: VPL-VW 2016 and later, VPL-XW",
+                  "enum": [
+                    "adcp"
+                  ]
+                },
+                {
+                  "title": "SDCP / PJ Talk: older VPL-VW and VPL-HW",
+                  "enum": [
+                    "sdcp"
+                  ]
+                }
+              ]
+            },
+            "password": {
+              "title": "Administrator password / 管理员密码",
+              "type": "string",
+              "x-schema-form": {
+                "type": "password"
+              },
+              "description": "默认 Projector，可手动修改为投影仪当前管理员密码。留空表示不提供密码；无认证模式会自动识别。 如需免密码控制，请在投影仪网页 ADCP 设置中关闭 Requires Authentication；保持开启则填写管理员密码。插件自动识别认证状态。",
+              "default": "Projector"
+            },
+            "community": {
+              "title": "SDCP community",
+              "type": "string",
+              "placeholder": "SONY",
+              "minLength": 4,
+              "maxLength": 4,
+              "description": "Only for SDCP projectors whose PJ Talk community was changed from SONY."
+            },
+            "port": {
+              "title": "Port / 端口",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535,
+              "description": "Only needed for a non-standard port. Requires an explicit protocol (ADCP default 53595, SDCP default 53484)."
+            },
+            "pollInterval": {
+              "title": "Poll interval / 状态同步间隔（秒）",
+              "type": "integer",
+              "minimum": 3,
+              "maximum": 300,
+              "placeholder": 10,
+              "description": "How often to check the projector while it is on. Standby is checked three times less often."
+            },
+            "id": {
+              "title": "Stable device ID / 固定设备标识",
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
+              "description": "Set once (for example theater-hw69); keep it unchanged when changing the IP address."
+            },
+            "autoPowerOn": {
+              "title": "Auto power on and wait / 自动开机并等待就绪",
+              "type": "boolean",
+              "default": false,
+              "description": "Optional. Input, picture and remote controls may wait up to the readiness timeout. Disabled by default."
+            },
+            "readyTimeout": {
+              "title": "Readiness timeout / 就绪等待上限（秒）",
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 300,
+              "default": 120
+            },
+            "inputSource": {
+              "title": "TV input picker / 电视输入列表",
+              "type": "string",
+              "default": "hdmi",
+              "oneOf": [
+                {
+                  "title": "HDMI sources / HDMI 输入",
+                  "enum": [
+                    "hdmi"
+                  ]
+                },
+                {
+                  "title": "Picture modes / 画面模式",
+                  "enum": [
+                    "pictureModes"
+                  ]
+                }
+              ]
+            },
+            "capabilities": {
+              "title": "Capability overrides / 能力覆盖",
+              "type": "object",
+              "properties": {
+                "inputs": {
+                  "title": "Inputs / 输入",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_.]+$"
+                  },
+                  "description": "Optional override of detected tokens; values must match your projector. Leave unset for discovery."
+                },
+                "pictureModes": {
+                  "title": "Picture modes / 画面模式",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_.]+$"
+                  },
+                  "description": "Optional override of detected tokens; values must match your projector. Leave unset for discovery."
+                },
+                "aspects": {
+                  "title": "Aspect ratios / 画幅",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_.]+$"
+                  },
+                  "description": "Optional override of detected tokens; values must match your projector. Leave unset for discovery."
+                },
+                "hdrModes": {
+                  "title": "HDR modes / HDR 模式",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_.]+$"
+                  },
+                  "description": "Optional override of detected tokens; values must match your projector. Leave unset for discovery."
+                },
+                "testPatterns": {
+                  "title": "Test patterns / 测试图",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_.]+$"
+                  },
+                  "description": "Optional override of detected tokens; values must match your projector. Leave unset for discovery."
+                },
+                "brightness": {
+                  "title": "brightness",
+                  "type": "boolean",
+                  "description": "Optional support override; leave unset for discovery."
+                },
+                "contrast": {
+                  "title": "contrast",
+                  "type": "boolean",
+                  "description": "Optional support override; leave unset for discovery."
+                },
+                "blank": {
+                  "title": "blank",
+                  "type": "boolean",
+                  "description": "Optional support override; leave unset for discovery."
+                },
+                "faults": {
+                  "title": "faults",
+                  "type": "boolean",
+                  "description": "Optional support override; leave unset for discovery."
+                },
+                "lightHours": {
+                  "title": "lightHours",
+                  "type": "boolean",
+                  "description": "Optional support override; leave unset for discovery."
+                },
+                "remote": {
+                  "title": "remote",
+                  "type": "boolean",
+                  "description": "Optional support override; leave unset for discovery."
+                }
+              }
+            },
+            "username": {
+              "title": "Administrator username / 管理员用户名",
+              "type": "string",
+              "default": "root",
+              "description": "Web administrator account. ADCP authenticates with the password only."
+            },
+            "language": {
+              "title": "Accessory names / 配件名称语言",
+              "type": "string",
+              "default": "en",
+              "oneOf": [
+                {
+                  "title": "English",
+                  "enum": [
+                    "en"
+                  ]
+                },
+                {
+                  "title": "简体中文",
+                  "enum": [
+                    "zh-CN"
+                  ]
+                }
+              ],
+              "description": "Each optional control and sensor is published as a separately named accessory."
+            }
+          }
+        }
+      },
+      "options": {
+        "title": "Feature options",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "title": "Feature option"
+        },
+        "description": "Use the Feature Options tab in this plugin's settings instead of editing these by hand."
+      },
+      "debug": {
+        "title": "Debug logging",
+        "type": "boolean",
+        "default": false,
+        "description": "Log protocol traffic for troubleshooting. Passwords are never logged."
+      }
+    }
+  },
+  "layout": [
+    {
+      "key": "projectors",
+      "type": "array",
+      "orderable": false,
+      "buttonText": "Add projector",
+      "items": [
+        "projectors[].name",
+        "projectors[].language",
+        "projectors[].host",
+        "projectors[].username",
+        "projectors[].password",
+        {
+          "type": "section",
+          "title": "Advanced",
+          "expandable": true,
+          "expanded": false,
+          "items": [
+            "projectors[].protocol",
+            "projectors[].port",
+            "projectors[].community",
+            "projectors[].pollInterval",
+            "projectors[].id",
+            "projectors[].inputSource",
+            "projectors[].autoPowerOn",
+            "projectors[].readyTimeout",
+            "projectors[].capabilities"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Additional settings",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "name",
+        "debug",
+        "options"
+      ]
+    }
+  ]
+}
