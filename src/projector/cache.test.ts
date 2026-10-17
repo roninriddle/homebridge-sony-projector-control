@@ -15,7 +15,9 @@ test("values written are read back by a new instance", () => {
 
   const cache = new ProjectorCache(directory, capturingLog());
 
-  cache.update("pj", { protocol: "adcp" });
+  cache.update("pj", { brightness: 45, contrast: 91, protocol: "adcp" });
+  assert.equal(new ProjectorCache(directory, capturingLog()).get("pj").brightness, 45);
+  assert.equal(new ProjectorCache(directory, capturingLog()).get("pj").contrast, 91);
   cache.setInput("pj", "hdmi1", { name: "Apple TV" });
   cache.setInput("pj", "hdmi1", { hidden: true });
 

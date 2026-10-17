@@ -1,8 +1,8 @@
 {
-  "name": "homebridge-sony-projector-unified",
+  "name": "homebridge-sony-projector-control",
   "displayName": "Sony Projector Control",
-  "version": "0.2.0-test",
-  "description": "Unified Sony ADCP/SDCP projector control, advanced picture controls, confirmed ready/cooling sensors and optional Matter power.",
+  "version": "0.2.1-test",
+  "description": "索尼投影仪控制：电源、画面调节、预热／就绪／冷却传感器，支持中英文设置。Sony ADCP/SDCP projector control.",
   "author": "roninriddle",
   "license": "MIT",
   "type": "module",
@@ -50,6 +50,7 @@
     "@stylistic/eslint-plugin": "5.10.0",
     "@types/node": "22.20.4",
     "eslint": "9.39.2",
+    "happy-dom": "21.0.3",
     "homebridge": "2.4.0",
     "typescript": "5.9.3",
     "typescript-eslint": "8.70.0"
@@ -68,15 +69,16 @@
     "NOTICE.md",
     "examples/*.json",
     "scripts/migrate-config.mjs",
-    "README.zh-CN.md"
+    "README.zh-CN.md",
+    "scripts/install-homebridge-ui-icon.mjs"
   ],
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/roninriddle/homebridge-sony-projector-unified.git"
+    "url": "git+https://github.com/roninriddle/homebridge-sony-projector-control.git"
   },
-  "homepage": "https://github.com/roninriddle/homebridge-sony-projector-unified#readme",
+  "homepage": "https://github.com/roninriddle/homebridge-sony-projector-control#readme",
   "bugs": {
-    "url": "https://github.com/roninriddle/homebridge-sony-projector-unified/issues"
+    "url": "https://github.com/roninriddle/homebridge-sony-projector-control/issues"
   }
 }

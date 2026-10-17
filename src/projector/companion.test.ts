@@ -197,6 +197,26 @@ describe("CompanionAccessory", () => {
     assert.equal(await bySubtype("advanced.fault")!.getCharacteristic(Characteristic.ContactSensorState).handleGetRequest(), 0);
   });
 
+  test("standby sliders are off and readable, retain observed levels, and reject offline reads", async () => {
+
+    const { Characteristic, bySubtype, controller, fake } = await rig([ "Enable.Controls.Brightness", "Enable.Controls.Contrast" ]);
+
+    await waitUntil(() => controller.store.get("observedPower") === "standby", { description: "observed standby", timeoutMs: 2000 });
+    const brightness = bySubtype("advanced.brightness")!.getCharacteristic(Characteristic.Brightness);
+    const on = bySubtype("advanced.brightness")!.getCharacteristic(Characteristic.On);
+
+    assert.equal(await brightness.handleGetRequest(), 0);
+    assert.equal(await on.handleGetRequest(), false);
+    await assert.rejects(async () => controller.setLevel("brightness", 45));
+    await brightness.handleSetRequest(45);
+    assert.ok(!fake.received.some(line => line.startsWith("power ") || (line === "brightness 45")));
+    controller.store.update({ brightness: 47, contrast: 93 });
+    assert.equal(await brightness.handleGetRequest(), 47);
+    controller.store.update({ reachable: false });
+    await assert.rejects(async () => brightness.handleGetRequest());
+    await assert.rejects(async () => on.handleGetRequest());
+  });
+
   test("unsupported advanced controls are removed after discovery", async () => {
 
     const { bySubtype, controller } = await rig(["Enable.Controls.Brightness"], { state: { power: "on" }, unsupported: ["brightness"] });

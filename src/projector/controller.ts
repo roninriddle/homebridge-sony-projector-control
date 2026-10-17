@@ -32,7 +32,9 @@ export interface ControllerTimings {
 // What the controller has learned about a projector, cached across restarts so HomeKit can be set up before the projector answers.
 export interface LearnedFacts {
 
+  brightness?: number;
   capabilities?: Capabilities;
+  contrast?: number;
   identity?: ProjectorIdentity;
   protocol?: Protocol;
 }
@@ -108,6 +110,12 @@ export class ProjectorController {
     this.#timings = { authPauseMs: 30000, backoffCeilingMs: 60000, faultsEveryMs: 60000, lightHoursEveryMs: 600000, pollMs, standbyPollMs: pollMs * 3,
       transitionPollMs: 2000, ...timings };
 
+    for(const key of [ "brightness", "contrast" ] as const) {
+
+      const value = initial[key];
+
+      if((typeof value === "number") && Number.isFinite(value) && (value >= 0) && (value <= 100)) { this.store.update({ [key]: value }); }
+    }
     this.store.onChange((key, value, previous) => this.#noticeChange(key, value, previous));
 
     signal.addEventListener("abort", () => {
@@ -250,6 +258,10 @@ export class ProjectorController {
 
   public async setLevel(name: "brightness" | "contrast", value: number): Promise<void> {
 
+    if(!this.#config.autoPowerOn && (this.store.get("observedPower") !== "on")) {
+
+      throw new ProjectorError(ErrorCode.BUSY, "Picture adjustment requires an observed running projector.");
+    }
     await this.#prepareForControl();
     await this.#command("Setting " + name, "set " + name, async (transport) => {
 

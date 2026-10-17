@@ -21,6 +21,7 @@ export const messages = {
     "blank": "Picture mute",
     "brightness": "Brightness",
     "busyError": "The projector is warming up or cooling down. Wait and test again.",
+    "cancel": "Cancel",
     "cancelledError": "The connection test was cancelled. Please try again.",
     "capabilityHint": "Test the connection in Settings to discover this model's supported features. Global settings apply to each pro" +
       "jector's capabilities.",
@@ -233,6 +234,7 @@ export const messages = {
     "validationNumber": "Enter a whole number within the indicated range.",
     "validationPort": "Port must be a whole number from 1 to 65535.",
     "validationProtocol": "Select ADCP or SDCP when specifying a custom port.",
+    "validationSave": "Complete or remove the highlighted projector before saving.",
     "validationTokens": "Use lowercase command tokens containing letters, digits, underscores or dots.",
     "warming": "Warming up"
   },
@@ -255,6 +257,7 @@ export const messages = {
     "blank": "画面静音",
     "brightness": "亮度",
     "busyError": "投影仪正在预热或冷却，请稍后重试。",
+    "cancel": "取消",
     "cancelledError": "连接测试已取消，请重试。",
     "capabilityHint": "在设置页测试连接后，可按该型号实际能力筛选功能。全局设置会根据各台设备的能力生效。",
     "categories": {
@@ -461,6 +464,7 @@ export const messages = {
     "validationNumber": "请填写提示范围内的整数。",
     "validationPort": "端口必须是 1 至 65535 的整数。",
     "validationProtocol": "填写自定义端口时，请选择 ADCP 或 SDCP 协议。",
+    "validationSave": "请补全标出的投影仪配置，或移除这条投影仪后再保存。",
     "validationTokens": "命令值只能包含小写字母、数字、下划线或点。",
     "warming": "预热中"
   }

@@ -35,7 +35,7 @@ export class AdvancedControls {
       const current = (): number => controller.store.get(key) ?? 0;
 
       service.getCharacteristic(Characteristic.Brightness)
-        .onGet(this.#available(current, () => controller.store.get(key) === null))
+        .onGet(this.#available(current, () => (controller.store.get(key) === null) && !this.#idle()))
         .onSet(async (value: CharacteristicValue) => runFromHomeKit(api, async () => controller.setLevel(key, Number(value)),
           () => service.getCharacteristic(Characteristic.Brightness).updateValue(current())));
       // HomeKit requires On for a Lightbulb. It is only a display companion;
@@ -92,6 +92,11 @@ export class AdvancedControls {
     this.#refresh();
   }
 
+  #idle(): boolean {
+
+    return [ "standby", "warming", "cooling" ].includes(this.#context.controller.store.get("observedPower"));
+  }
+
   #available(read: () => CharacteristicValue, unknown: () => boolean = () => false): () => CharacteristicValue {
 
     const { api, controller } = this.#context;
@@ -114,7 +119,7 @@ export class AdvancedControls {
       service?.getCharacteristic(Characteristic.On).updateValue(live ? store.get("power") === "on" : failure);
       const level = store.get(key);
 
-      service?.getCharacteristic(Characteristic.Brightness).updateValue(live && (level !== null) ? level : failure);
+      service?.getCharacteristic(Characteristic.Brightness).updateValue(live && ((level !== null) || this.#idle()) ? level ?? 0 : failure);
     }
 
     for(const key of [ "hdr", "testPattern" ] as const) {

@@ -1,7 +1,10 @@
 /* settings.ts: Plugin-wide constants. */
 
 // The npm package name. Homebridge uses it to associate cached and external accessories with this plugin.
-export const PLUGIN_NAME = "homebridge-sony-projector-unified";
+export const PLUGIN_NAME = "homebridge-sony-projector-control";
+
+// Immutable namespace: package renames must never change paired accessory UUIDs.
+export const UUID_NAMESPACE = "homebridge-sony-projector-unified";
 
 // The platform alias users put in config.json. It must match `pluginAlias` in config.schema.json.
 export const PLATFORM_NAME = "SonyProjectorUnified";

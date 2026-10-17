@@ -19,7 +19,9 @@ export interface CachedProjector {
 
   // Keep the Bonjour service instance name stable across config and Home app renames.
   advertisedName?: string;
+  brightness?: number;
   capabilities?: Capabilities;
+  contrast?: number;
   identity?: ProjectorIdentity;
   inputs?: Record<string, InputPreference>;
 

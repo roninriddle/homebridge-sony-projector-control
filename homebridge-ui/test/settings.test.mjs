@@ -49,7 +49,7 @@ test('scoped feature edits preserve other projectors and unknown future options'
 });
 test('schema fallback renders port as a numeric entry while platform and package identities stay stable',()=>{
   const schema=JSON.parse(readFileSync(new URL('../../config.schema.json',import.meta.url)));const pkg=JSON.parse(readFileSync(new URL('../../package.json',import.meta.url)));
-  assert.equal(schema.schema.properties.projectors.items.properties.port['x-schema-form'].type,'number');assert.equal(schema.pluginAlias,'SonyProjectorUnified');assert.equal(pkg.name,'homebridge-sony-projector-unified');assert.equal(pkg.displayName,'Sony Projector Control');
+  assert.equal(schema.schema.properties.projectors.items.properties.port['x-schema-form'].type,'number');assert.equal(schema.pluginAlias,'SonyProjectorUnified');assert.equal(pkg.name,'homebridge-sony-projector-control');assert.equal(pkg.displayName,'Sony Projector Control');
 });
 test('every shipped feature and remote choice has complete Chinese and English UI copy',async()=>{
   const {featureOptionCategories,featureOptions}=await import('../../src/options.ts');

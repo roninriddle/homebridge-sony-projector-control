@@ -4,7 +4,7 @@
   "singular": true,
   "customUi": true,
   "headerDisplay": "Sony Projector Control",
-  "footerDisplay": "Run this plugin as a [child bridge](https://github.com/homebridge/homebridge/wiki/Child-Bridges). Each projector appears as its own TV accessory: add it in the Home app with **Add Accessory > More options** and your Homebridge setup code.",
+  "footerDisplay": "请将插件作为独立子桥运行。投影仪电视需在家庭 App「添加配件 → 更多选项」中单独添加。Run as a child bridge; add each TV separately in Apple Home.",
   "schema": {
     "type": "object",
     "properties": {
@@ -20,20 +20,20 @@
           "type": "object",
           "properties": {
             "name": {
-              "title": "Name / \u540d\u79f0",
+              "title": "Name / 名称",
               "type": "string",
               "placeholder": "Projector",
               "description": "How the projector is named in HomeKit."
             },
             "host": {
-              "title": "IP address or hostname / \u5730\u5740",
+              "title": "IP address or hostname / 地址",
               "type": "string",
               "placeholder": "192.168.1.50",
               "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9.:-]{0,251}[A-Za-z0-9])?$",
               "description": "Give the projector a fixed address (a DHCP reservation) so it does not change."
             },
             "protocol": {
-              "title": "Control protocol / \u63a7\u5236\u534f\u8bae",
+              "title": "Control protocol / 控制协议",
               "type": "string",
               "default": "auto",
               "oneOf": [
@@ -58,12 +58,12 @@
               ]
             },
             "password": {
-              "title": "Administrator password / \u7ba1\u7406\u5458\u5bc6\u7801",
+              "title": "Administrator password / 管理员密码",
               "type": "string",
               "x-schema-form": {
                 "type": "password"
               },
-              "description": "\u9ed8\u8ba4 Projector\uff0c\u53ef\u624b\u52a8\u4fee\u6539\u4e3a\u6295\u5f71\u4eea\u5f53\u524d\u7ba1\u7406\u5458\u5bc6\u7801\u3002\u7559\u7a7a\u8868\u793a\u4e0d\u63d0\u4f9b\u5bc6\u7801\uff1b\u65e0\u8ba4\u8bc1\u6a21\u5f0f\u4f1a\u81ea\u52a8\u8bc6\u522b\u3002 \u5982\u9700\u514d\u5bc6\u7801\u63a7\u5236\uff0c\u8bf7\u5728\u6295\u5f71\u4eea\u7f51\u9875 ADCP \u8bbe\u7f6e\u4e2d\u5173\u95ed Requires Authentication\uff1b\u4fdd\u6301\u5f00\u542f\u5219\u586b\u5199\u7ba1\u7406\u5458\u5bc6\u7801\u3002\u63d2\u4ef6\u81ea\u52a8\u8bc6\u522b\u8ba4\u8bc1\u72b6\u6001\u3002",
+              "description": "默认 Projector，可手动修改为投影仪当前管理员密码。留空表示不提供密码；无认证模式会自动识别。 如需免密码控制，请在投影仪网页 ADCP 设置中关闭 Requires Authentication；保持开启则填写管理员密码。插件自动识别认证状态。",
               "default": "Projector"
             },
             "community": {
@@ -75,7 +75,7 @@
               "description": "Only for SDCP projectors whose PJ Talk community was changed from SONY."
             },
             "port": {
-              "title": "Port / \u7aef\u53e3",
+              "title": "Port / 端口",
               "type": "integer",
               "minimum": 1,
               "maximum": 65535,
@@ -85,7 +85,7 @@
               }
             },
             "pollInterval": {
-              "title": "Poll interval / \u72b6\u6001\u540c\u6b65\u95f4\u9694\uff08\u79d2\uff09",
+              "title": "Poll interval / 状态同步间隔（秒）",
               "type": "integer",
               "minimum": 3,
               "maximum": 300,
@@ -93,37 +93,37 @@
               "description": "How often to check the projector while it is on. Standby is checked three times less often."
             },
             "id": {
-              "title": "Stable device ID / \u56fa\u5b9a\u8bbe\u5907\u6807\u8bc6",
+              "title": "Stable device ID / 固定设备标识",
               "type": "string",
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$",
               "description": "Set once (for example theater-hw69); keep it unchanged when changing the IP address."
             },
             "autoPowerOn": {
-              "title": "Auto power on and wait / \u81ea\u52a8\u5f00\u673a\u5e76\u7b49\u5f85\u5c31\u7eea",
+              "title": "Auto power on and wait / 自动开机并等待就绪",
               "type": "boolean",
               "default": false,
               "description": "Optional. Input, picture and remote controls may wait up to the readiness timeout. Disabled by default."
             },
             "readyTimeout": {
-              "title": "Readiness timeout / \u5c31\u7eea\u7b49\u5f85\u4e0a\u9650\uff08\u79d2\uff09",
+              "title": "Readiness timeout / 就绪等待上限（秒）",
               "type": "integer",
               "minimum": 10,
               "maximum": 300,
               "default": 120
             },
             "inputSource": {
-              "title": "TV input picker / \u7535\u89c6\u8f93\u5165\u5217\u8868",
+              "title": "TV input picker / 电视输入列表",
               "type": "string",
               "default": "hdmi",
               "oneOf": [
                 {
-                  "title": "HDMI sources / HDMI \u8f93\u5165",
+                  "title": "HDMI sources / HDMI 输入",
                   "enum": [
                     "hdmi"
                   ]
                 },
                 {
-                  "title": "Picture modes / \u753b\u9762\u6a21\u5f0f",
+                  "title": "Picture modes / 画面模式",
                   "enum": [
                     "pictureModes"
                   ]
@@ -131,11 +131,11 @@
               ]
             },
             "capabilities": {
-              "title": "Capability overrides / \u80fd\u529b\u8986\u76d6",
+              "title": "Capability overrides / 能力覆盖",
               "type": "object",
               "properties": {
                 "inputs": {
-                  "title": "Inputs / \u8f93\u5165",
+                  "title": "Inputs / 输入",
                   "type": "array",
                   "items": {
                     "type": "string",
@@ -144,7 +144,7 @@
                   "description": "Optional override of detected tokens; values must match your projector. Leave unset for discovery."
                 },
                 "pictureModes": {
-                  "title": "Picture modes / \u753b\u9762\u6a21\u5f0f",
+                  "title": "Picture modes / 画面模式",
                   "type": "array",
                   "items": {
                     "type": "string",
@@ -153,7 +153,7 @@
                   "description": "Optional override of detected tokens; values must match your projector. Leave unset for discovery."
                 },
                 "aspects": {
-                  "title": "Aspect ratios / \u753b\u5e45",
+                  "title": "Aspect ratios / 画幅",
                   "type": "array",
                   "items": {
                     "type": "string",
@@ -162,7 +162,7 @@
                   "description": "Optional override of detected tokens; values must match your projector. Leave unset for discovery."
                 },
                 "hdrModes": {
-                  "title": "HDR modes / HDR \u6a21\u5f0f",
+                  "title": "HDR modes / HDR 模式",
                   "type": "array",
                   "items": {
                     "type": "string",
@@ -171,7 +171,7 @@
                   "description": "Optional override of detected tokens; values must match your projector. Leave unset for discovery."
                 },
                 "testPatterns": {
-                  "title": "Test patterns / \u6d4b\u8bd5\u56fe",
+                  "title": "Test patterns / 测试图",
                   "type": "array",
                   "items": {
                     "type": "string",
@@ -212,13 +212,13 @@
               }
             },
             "username": {
-              "title": "Administrator username / \u7ba1\u7406\u5458\u7528\u6237\u540d",
+              "title": "Administrator username / 管理员用户名",
               "type": "string",
               "default": "root",
               "description": "Web administrator account. ADCP authenticates with the password only."
             },
             "language": {
-              "title": "Accessory names / \u914d\u4ef6\u540d\u79f0\u8bed\u8a00",
+              "title": "Accessory names / 配件名称语言",
               "type": "string",
               "default": "en",
               "oneOf": [
@@ -229,7 +229,7 @@
                   ]
                 },
                 {
-                  "title": "\u7b80\u4f53\u4e2d\u6587",
+                  "title": "简体中文",
                   "enum": [
                     "zh-CN"
                   ]
@@ -256,7 +256,7 @@
         "description": "Log protocol traffic for troubleshooting. Passwords are never logged."
       },
       "uiLanguage": {
-        "title": "Interface language / \u754c\u9762\u8bed\u8a00",
+        "title": "Interface language / 界面语言",
         "type": "string",
         "default": "en",
         "oneOf": [
@@ -267,7 +267,7 @@
             ]
           },
           {
-            "title": "\u7b80\u4f53\u4e2d\u6587",
+            "title": "简体中文",
             "enum": [
               "zh-CN"
             ]

@@ -5,7 +5,7 @@
  */
 import { Categories, HAPStatus, acquireService, notResponding } from "homebridge-plugin-utils";
 import type { CharacteristicValue, PlatformAccessory, Service } from "homebridge";
-import { PLUGIN_NAME, Subtype } from "../settings.ts";
+import { Subtype, UUID_NAMESPACE } from "../settings.ts";
 import { inputLabel, pictureModeLabel } from "../protocol/labels.ts";
 import type { AccessoryContext } from "./context.ts";
 import { Option } from "../options.ts";
@@ -38,7 +38,7 @@ export class TelevisionAccessory {
     const advertisedName = saved.advertisedName ?? saved.name ?? config.name;
 
     if(!saved.advertisedName) { context.cache.update(config.id, { advertisedName }); }
-    this.accessory = new api.platformAccessory(advertisedName, uuid.generate(PLUGIN_NAME + ":" + config.id + ":tv"), Categories.TELEVISION);
+    this.accessory = new api.platformAccessory(advertisedName, uuid.generate(UUID_NAMESPACE + ":" + config.id + ":tv"), Categories.TELEVISION);
 
     const tv = acquireService(this.accessory, Service.Television, config.name);
 

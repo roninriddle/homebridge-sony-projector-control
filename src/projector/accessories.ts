@@ -2,7 +2,7 @@
  * The same projector controller serves every accessory; there is no additional polling.
  */
 import { Categories, setAccessoryName, setServiceName } from "homebridge-plugin-utils";
-import { PLATFORM_NAME, PLUGIN_NAME } from "../settings.ts";
+import { PLATFORM_NAME, PLUGIN_NAME, UUID_NAMESPACE } from "../settings.ts";
 import { aspectLabel, inputLabel, pictureModeLabel } from "../protocol/labels.ts";
 import type { AccessoryContext } from "./context.ts";
 import { CompanionAccessory } from "./companion.ts";
@@ -89,7 +89,7 @@ export class CompanionAccessories {
 
     for(const description of functionsFor(this.#context)) {
 
-      const id = uuid.generate(PLUGIN_NAME + ":" + config.id + ":function:" + description.subtype);
+      const id = uuid.generate(UUID_NAMESPACE + ":" + config.id + ":function:" + description.subtype);
       const existing = this.#live.get(id) ?? this.#cached.get(id);
       const defaultName = config.name + " " + description.label;
       const accessory = existing ?? new api.platformAccessory(defaultName, id, description.category);

@@ -1,3 +1,11 @@
+# 0.2.1-test
+
+- 修复内嵌页面移除、无效配置导致保存无提示的问题，允许空列表持久化。
+- 正式包名 Sony Projector Control，保留旧配对 UUID 与平台别名兼容；提供 Homebridge UI 5.29 图标适配。
+- 待机滑块显示关闭及最后实测数值，重启后保留，离线仍不可用。
+- 功能模块折叠，遥控器停用后隐藏下属设置。
+- 跟随 Homebridge 语言，补齐中文帮助与 README。
+
 # Sony Projector Control changelog
 
 ## 0.2.0-test (2026-10-17)

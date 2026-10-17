@@ -21,6 +21,7 @@ let language;
 let selected = 0;
 let tab = "settings";
 let scope = "";
+const openCategories = new Set();
 let generation = 0;
 let pendingProbe = 0;
 let stageQueue = Promise.resolve();
@@ -70,7 +71,7 @@ function refreshSaveState() {
 
   if(save) {
 
-    save.disabled = !ready;
+    save.disabled = saving || Boolean(staging);
     save.textContent = t(saving ? "saving" : "save");
   }
   const status = document.getElementById("saveStatus");
@@ -535,20 +536,24 @@ function renderSettings(body) {
     "autoPowerOn", "autoPowerHint"), inputField(p, "readyTimeout", { max: 300, min: 10, placeholder: 120, type: "number" }));
   renderOverrides(p, advanced);
   connection.append(advanced);
-  connection.append(button(t("remove"), () => {
+  const removal = node("div", undefined, "spj-removal");
 
-    if(!window.confirm(t("removeConfirm"))) {
+  removal.append(button(t("remove"), () => {
 
-      return;
-    }
-    config.projectors.splice(selected, 1);
-    selected = Math.max(0, selected - 1);
-    results.clear();
-    capabilities.clear();
-    generation++;
-    render();
-    stage();
+    removal.replaceChildren(node("p", t("removeConfirm")));
+    removal.append(button(t("remove"), () => {
+
+      config.projectors.splice(selected, 1);
+      selected = Math.max(0, selected - 1);
+      results.clear();
+      capabilities.clear();
+      generation++;
+      render();
+      stage();
+    }, "spj-danger"), button(t("cancel"), render));
+    resize();
   }, "spj-danger"));
+  connection.append(removal);
   body.append(connection);
   const additional = details("additional");
 
@@ -576,12 +581,24 @@ function renderFeatures(body) {
 
   for(const category of catalog.categories) {
 
-    const section = node("section", undefined, "spj-section");
+    const section = node("details", undefined, "spj-section spj-feature-group");
+    const title = messages[language].categories[category.name];
+    const enabled = (catalog.options[category.name] || []).filter(option => engine.test(engine.expandOption(category.name, option.name), scope || undefined));
 
-    section.append(node("h2", messages[language].categories[category.name]));
+    section.open = openCategories.has(category.name);
+    section.append(node("summary", title + " · " + enabled.length + "/" + (catalog.options[category.name] || []).length));
+    listen(section, "toggle", () => {
+
+      if(section.open) { openCategories.add(category.name); } else { openCategories.delete(category.name); }
+      resize();
+    });
 
     for(const option of catalog.options[category.name] || []) {
 
+      if((category.name === "Remote") && option.name && !engine.test("Remote", scope || undefined)) {
+
+        continue;
+      }
       const required = option.meta?.requires;
 
       if(caps && required && (Array.isArray(caps[required]) ? !caps[required].length : caps[required] !== true)) {
@@ -593,7 +610,11 @@ function renderFeatures(body) {
       const row = node("div", undefined, "spj-option");
       const on = engine.test(key, scope || undefined);
 
-      row.append(node("h3", copy[0]), node("p", copy[1], "spj-hint"));
+      const description = node("details", undefined, "spj-option-description");
+
+      description.append(node("summary", copy[0]), node("p", copy[1], "spj-hint"));
+      listen(description, "toggle", resize);
+      row.append(description);
       const set = (mode, value) => {
 
         if(mode === "inherit") {
@@ -639,11 +660,13 @@ function renderHelp(body) {
 
     body.append(node("p", t(key)));
   }
-  const base = "https://github.com/roninriddle/homebridge-sony-projector-unified";
+  const base = "https://github.com/roninriddle/homebridge-sony-projector-control";
 
   for(const [ key, suffix ] of [ [ "guide", language === "zh-CN" ? "/blob/main/README.zh-CN.md" : "#readme" ], [ "automations",
-    "/blob/main/docs/RemoteAndAutomations.md" ], [ "troubleshooting", "/blob/main/docs/Troubleshooting.md" ], [ "featureGuide",
-    "/blob/main/docs/FeatureOptions.md" ], [ "security", "/blob/main/docs/Security.md" ], [ "report", "/issues/new/choose" ], [ "release", "/releases" ] ]) {
+    "/blob/main/docs/RemoteAndAutomations" + (language === "zh-CN" ? ".zh-CN" : "") + ".md" ], [ "troubleshooting",
+    "/blob/main/docs/Troubleshooting" + (language === "zh-CN" ? ".zh-CN" : "") + ".md" ], [ "featureGuide",
+    "/blob/main/docs/FeatureOptions" + (language === "zh-CN" ? ".zh-CN" : "") + ".md" ], [ "security",
+    "/blob/main/docs/Security" + (language === "zh-CN" ? ".zh-CN" : "") + ".md" ], [ "report", "/issues/new/choose" ], [ "release", "/releases" ] ]) {
 
     const link = node("a", t(key));
 
@@ -661,7 +684,16 @@ async function save() {
 
   if(!valid()) {
 
+    const invalid = validateSettings(config).findIndex(errors => Object.keys(errors).length > 0);
+
+    if(invalid >= 0) { selected = invalid; }
+    tab = "settings";
+    render();
     showValidation();
+    const control = app.querySelector("[aria-invalid=\"true\"]");
+
+    control?.focus();
+    homebridge.toast.error(t("validationSave"));
 
     return;
   }
@@ -794,14 +826,11 @@ try {
 
     savedLanguage = globalThis.localStorage.getItem("sony-projector-control.language");
   } catch { /* Browser storage can be unavailable. */ }
-  language = selectLanguage(config.uiLanguage || savedLanguage, homebridge.server?.env?.lang || globalThis.navigator.language);
+  let hostLanguage = homebridge.serverEnv?.env?.lang || globalThis.navigator.language;
 
-  if(!config.projectors.length) {
+  try { hostLanguage = await homebridge.i18nCurrentLang?.() || hostLanguage; } catch { /* Older SDKs expose serverEnv only. */ }
+  language = selectLanguage(config.uiLanguage || savedLanguage, hostLanguage);
 
-    config.projectors.push({ autoPowerOn: false, host: "", id: "projector-" + Array.from(globalThis.crypto.getRandomValues(new Uint8Array(8)),
-      n => n.toString(16).padStart(2, "0")).join(""),
-    name: t("projector"), password: "Projector", protocol: "auto", username: "root" });
-  }
   render();
 } catch {
 

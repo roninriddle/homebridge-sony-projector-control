@@ -1,7 +1,7 @@
 /* Optional Matter power outlet. Design adapted from Kerem Erkan's MIT-licensed
  * matter-power.ts; see NOTICE.md. Shares the existing controller and poll loop.
  */
-import { PLATFORM_NAME, PLUGIN_NAME } from "../settings.ts";
+import { PLATFORM_NAME, PLUGIN_NAME, UUID_NAMESPACE } from "../settings.ts";
 import type { AccessoryContext } from "./context.ts";
 import type { MatterAccessory } from "homebridge";
 
@@ -20,7 +20,7 @@ export class MatterPower {
 
     this.#context = context;
     this.#signal = signal;
-    this.uuid = context.api.hap.uuid.generate(PLUGIN_NAME + ":" + context.config.id + ":matter-power");
+    this.uuid = context.api.hap.uuid.generate(UUID_NAMESPACE + ":" + context.config.id + ":matter-power");
     context.controller.store.onChange(() => this.sync());
   }
 

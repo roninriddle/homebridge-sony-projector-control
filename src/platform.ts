@@ -121,6 +121,10 @@ export class SonyProjectorsPlatform implements DynamicPlatformPlugin {
     const controller = new ProjectorController({ config, initial: cache.get(config.id), isEnabled: (option): boolean => options.test(option, config.id), log,
       signal: this.#abort.signal });
 
+    controller.store.onChange((key, value) => {
+
+      if(((key === "brightness") || (key === "contrast")) && (typeof value === "number")) { cache.update(config.id, { [key]: value }); }
+    });
     controller.onLearned(() => cache.update(config.id, { capabilities: controller.capabilities, identity: controller.identity, protocol: controller.protocol }));
 
     const context: AccessoryContext = { api: this.#api, cache, config, controller, enabled: (option) => options.test(option, config.id), log,
