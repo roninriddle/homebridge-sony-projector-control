@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Sony projector">
+  <rect width="128" height="128" rx="28" fill="#15283d"/>
+  <path d="M29 44h70a11 11 0 0 1 11 11v31H18V55a11 11 0 0 1 11-11Z" fill="#eaf2fa"/>
+  <path d="M24 86v9m80-9v9" stroke="#eaf2fa" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="85" cy="65" r="17" fill="#208cce" stroke="#15283d" stroke-width="5"/>
+  <circle cx="85" cy="65" r="7" fill="#93d8ff"/>
+  <path d="M31 59h19m-19 8h19m-19 8h14" stroke="#607b94" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="58" cy="50" r="2.5" fill="#50c997"/>
+</svg>

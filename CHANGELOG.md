@@ -1,4 +1,14 @@
-# Sony Projector Unified changelog
+# Sony Projector Control changelog
+
+## 0.2.0-test (2026-10-17)
+
+- Rename the display name to Sony Projector Control; retain package/platform identifiers and pairing continuity.
+- Add an original SVG projector icon to Settings and README, plus a Chinese introduction in the main GitHub README.
+- Add complete Simplified Chinese / English plugin settings, feature descriptions, help, validation and connection status, with an independently saved interface preference.
+- Add masked administrator-password reveal/hide and reset masking on navigation.
+- Move Test connection into Settings; use the current unsaved address, credentials, explicit protocol and numeric port without saving or powering on.
+- Replace Advanced port sliders with bounded integer inputs; reject invalid or ambiguous custom ports before probing.
+- Preserve hidden/unknown configuration, feature scopes and Homebridge pairing metadata while staging edits.
 
 ## 0.1.0-test (2026-10-17)
 

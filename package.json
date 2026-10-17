@@ -1,7 +1,7 @@
 {
   "name": "homebridge-sony-projector-unified",
-  "displayName": "Sony Projector Unified",
-  "version": "0.1.0-test",
+  "displayName": "Sony Projector Control",
+  "version": "0.2.0-test",
   "description": "Unified Sony ADCP/SDCP projector control, advanced picture controls, confirmed ready/cooling sensors and optional Matter power.",
   "author": "roninriddle",
   "license": "MIT",
@@ -35,8 +35,8 @@
     "check-docs": "homebridge-plugin-utils prepare-docs dist/options.js --check",
     "lint": "eslint --max-warnings=0 eslint.config.mjs src homebridge-ui/server.js homebridge-ui/public/*.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "node --test --test-timeout=20000 \"src/**/*.test.ts\"",
-    "test:coverage": "node --test --experimental-test-coverage --test-timeout=20000 \"src/**/*.test.ts\"",
+    "test": "node --test --test-timeout=20000 \"src/**/*.test.ts\" \"homebridge-ui/test/*.test.mjs\"",
+    "test:coverage": "node --test --experimental-test-coverage --test-timeout=20000 \"src/**/*.test.ts\" \"homebridge-ui/test/*.test.mjs\"",
     "prepublishOnly": "npm run lint && npm run typecheck && npm test && npm run build",
     "dev": "npm run build && homebridge -I -D -U ./test/hbConfig -P ..",
     "fake-projector": "node src/fake-projector.helpers.ts"

@@ -1,6 +1,6 @@
 # Credits
 
-Sony Projector Unified is a derivative of shivanathd/homebridge-sony-projectors, with additional functionality informed by the Steven Ward and Kerem Erkan plugins. See NOTICE.md for exact sources and licenses. The table below is retained from the base project.
+Sony Projector Control is a derivative of shivanathd/homebridge-sony-projectors, with additional functionality informed by the Steven Ward and Kerem Erkan plugins. See NOTICE.md for exact sources and licenses. The table below is retained from the base project.
 
 | Project | License | What it contributed |
 |---|---|---|

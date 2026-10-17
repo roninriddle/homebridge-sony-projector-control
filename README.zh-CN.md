@@ -1,13 +1,26 @@
-# 索尼投影仪综合插件
+# Sony Projector Control · 索尼投影仪控制
 
-GitHub 预发布版 **0.1.0-test**，尚未发布到 npm。支持 ADCP、SDCP/PJ Talk；功能按每台投影仪实际能力显示。
+<img src="homebridge-ui/public/projector.svg" width="96" alt="投影仪图标">
+
+GitHub 预发布版 **0.2.0-test**，尚未发布到 npm。支持 ADCP、SDCP/PJ Talk；功能按每台投影仪实际能力显示。
 
 HW69 已完成有人观察的开关机、亮度／对比度和就绪／冷却基础验收；VW598 已完成只读型号与能力查询，控制验收待完成。其他机型及高级功能须分别验证，详见[验证范围](docs/Validation.md)。
+
+## 设置界面
+
+- 页面右上角切换“简体中文／English”，覆盖设置、功能选项、帮助、状态与错误提示；点击“保存设置”保留选择。周边 Homebridge 对话框使用 Homebridge 自身的语言。
+- 管理员密码默认隐藏，点击“显示密码／隐藏密码”切换；重新打开页面或切换投影仪后恢复隐藏。
+- 在“设置”中填写 IP、用户名和密码后，点击同一表单内的“测试连接”。测试使用尚未保存的当前内容，包括高级页填写的协议和端口；只查询型号、固件、状态和能力，不保存、不自动开机。
+- “高级 → 端口”为数字输入框，范围 1–65535；留空使用默认值，手动指定端口时须明确选择 ADCP 或 SDCP。
+- “界面语言”与“家庭配件名称语言”分别设置；界面切换不改现有配对、自定义名称或设备标识。
+- 投影仪图标用于设置页与本说明。Homebridge 插件列表的图标来自官方插件目录，并不读取插件内的自定义图标文件。
+
+显示名称改为 **Sony Projector Control**，包名仍是 `homebridge-sony-projector-unified`，平台仍是 `SonyProjectorUnified`。从 0.1.0-test 原位升级，保留固定 ID、桥身份与发现名称，无需重新配对。
 
 ## 安装与配对
 
 1. 备份原配置。停用原插件对目标投影仪的控制，保留原插件及其恢复资料。
-2. 从 [GitHub Releases](https://github.com/roninriddle/homebridge-sony-projector-unified/releases) 下载安装包，核对 `SHA256SUMS`，在对应 Homebridge 主机运行 `npm install -g /完整路径/homebridge-sony-projector-unified-0.1.0-test.tgz`。
+2. 从 [GitHub Releases](https://github.com/roninriddle/homebridge-sony-projector-unified/releases) 下载安装包，核对 `SHA256SUMS`，在对应 Homebridge 主机运行 `npm install -g /完整路径/homebridge-sony-projector-unified-0.2.0-test.tgz`。
 3. 添加 `SonyProjectorUnified` 平台，建议使用独立子桥。不要同时运行两套插件控制同一投影仪。
 4. 用户名默认 `root`、密码默认 `Projector`，可修改并测试连接。用户名是网页管理账号；ADCP 仅用密码认证。
 5. 如需免密码控制，在投影仪网页的 ADCP 设置中关闭 **Requires Authentication**。插件识别无认证模式；它不会替你修改机器认证设置。
@@ -19,7 +32,7 @@ HW69 已完成有人观察的开关机、亮度／对比度和就绪／冷却基
 ```json
 {
   "platform": "SonyProjectorUnified",
-  "name": "Sony Projector Unified",
+  "name": "Sony Projector Control",
   "projectors": [{
     "id": "theater-projector",
     "name": "影院投影仪",
