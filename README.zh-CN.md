@@ -2,7 +2,7 @@
 
 <img src="homebridge-ui/public/projector.svg" width="96" alt="投影仪图标">
 
-GitHub 预发布版 **0.2.1-test**，尚未发布到 npm。支持 ADCP、SDCP/PJ Talk；功能按每台投影仪实际能力显示。
+GitHub 预发布版 **0.2.2-test**，尚未发布到 npm。支持 ADCP、SDCP/PJ Talk；功能按每台投影仪实际能力显示。
 
 HW69 已完成有人观察的开关机、亮度／对比度和就绪／冷却基础验收；VW598 已完成只读型号与能力查询，控制验收待完成。其他机型及高级功能须分别验证，详见[验证范围](docs/Validation.md)。
 
@@ -20,7 +20,7 @@ HW69 已完成有人观察的开关机、亮度／对比度和就绪／冷却基
 ## 安装与配对
 
 1. 备份原配置。停用原插件对目标投影仪的控制，保留原插件及其恢复资料。
-2. 从 [GitHub Releases](https://github.com/roninriddle/homebridge-sony-projector-control/releases) 下载安装包，核对 `SHA256SUMS`，在对应 Homebridge 主机运行 `npm install -g /完整路径/homebridge-sony-projector-control-0.2.1-test.tgz`。
+2. 从 [GitHub Releases](https://github.com/roninriddle/homebridge-sony-projector-control/releases) 下载安装包，核对 `SHA256SUMS`，在对应 Homebridge 主机运行 `npm install -g /完整路径/homebridge-sony-projector-control-0.2.2-test.tgz`。
 3. 添加 `SonyProjectorUnified` 平台，建议使用独立子桥。不要同时运行两套插件控制同一投影仪。
 4. 用户名默认 `root`、密码默认 `Projector`，可修改并测试连接。用户名是网页管理账号；ADCP 仅用密码认证。
 5. 如需免密码控制，在投影仪网页的 ADCP 设置中关闭 **Requires Authentication**。插件识别无认证模式；它不会替你修改机器认证设置。
@@ -108,7 +108,7 @@ node scripts/migrate-config.mjs old-config.json new-platform.json
 
 电视是单独发布的 HomeKit 配件，有自己的通信端口。跨网段测试时，建议在该 Homebridge 实例的完整配置顶层设置固定 `ports` 范围；范围须有足够空闲端口容纳所有外部配件。该设置属于 Homebridge，不放在插件 `projectors` 中。插件会保存电视初次广播的名称，之后调整配置名称或家庭内显示名称不改变这一发现入口。
 
-## 0.2.1-test 使用说明
+## 0.2.2-test 使用说明
 
 功能页按模块收起；展开后点击功能名称可查看说明。Apple TV 遥控器停用时，下属按键选项隐藏，已有选择保留，重新启用后恢复。界面语言默认跟随 Homebridge，手动选择后保存。
 
@@ -117,3 +117,7 @@ node scripts/migrate-config.mjs old-config.json new-platform.json
 待机时亮度、对比度显示关闭，使用最后一次实际读取并保存的数值；首次没有读数时使用 0。此时不会读取实时画面，也不会发送参数或开机指令。连接故障仍显示未响应。
 
 Homebridge UI 5.29.0 的插件卡片图标仅来自官方目录。对于本地私有安装，可手动运行 `node scripts/install-homebridge-ui-icon.mjs <homebridge-config-ui-x绝对路径>`，脚本只增加本插件图标，并在原文件旁保存 `.before-sony-projector-control` 备份。重启 Homebridge UI 后生效。恢复时把备份复制回原文件；UI 升级会覆盖此适配，其他版本脚本会拒绝修改。
+
+## 滑动开关与默认设置
+
+功能选项的启用／停用使用 iOS 样式开关：绿色为启用，灰色为停用。点击开关会为当前设置范围保存明确选择；点击旁边「恢复默认」可回到全局继承或插件默认值。下方文字显示当前有效状态与继承来源。遥控动作等有多个值的选项仍用下拉菜单；窄屏下控件自动换行，避免文字被截断。Apple TV 遥控器主开关关闭后，下属设置收起；再打开时恢复原来的选择。最后点击「保存设置」。

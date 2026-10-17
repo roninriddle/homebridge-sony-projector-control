@@ -5,8 +5,9 @@
  * transport's failure handling can be tested without hardware.
  */
 import type { AddressInfo, Server, Socket } from "node:net";
-import { createHash, randomBytes } from "node:crypto";
 import { createServer } from "node:net";
+import { hashChallenge } from "./adcp-parse.ts";
+import { randomBytes } from "node:crypto";
 
 // A port nothing listens on, for "projector unreachable" tests. Port 1 needs root to bind, so no parallel test file can take it; a port obtained by opening
 // and closing a random listener can be grabbed by another test's fake projector a moment later.
@@ -200,7 +201,9 @@ export async function startFakeAdcp(options: FakeAdcpOptions = {}): Promise<Fake
         if(query) { return String(state[command]); }
 
         if(!/^\d+$/.test(value) || (Number(value) > 100)) { return "err_val"; }
-        state[command] = Number(value);
+
+        // Keep untrusted command text out of property assignment, even inside this allowlisted switch.
+        if(command === "brightness") { state.brightness = Number(value); } else { state.contrast = Number(value); }
 
         return "ok";
 
@@ -314,7 +317,7 @@ export async function startFakeAdcp(options: FakeAdcpOptions = {}): Promise<Fake
 
           authAttempts++;
 
-          if(line === createHash("sha256").update(challenge! + options.password!).digest("hex")) {
+          if(line === hashChallenge(challenge!, options.password!)) {
 
             authenticated = true;
             write("ok");

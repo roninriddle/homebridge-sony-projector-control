@@ -1,7 +1,7 @@
 {
   "name": "homebridge-sony-projector-control",
   "displayName": "Sony Projector Control",
-  "version": "0.2.1-test",
+  "version": "0.2.2-test",
   "description": "索尼投影仪控制：电源、画面调节、预热／就绪／冷却传感器，支持中英文设置。Sony ADCP/SDCP projector control.",
   "author": "roninriddle",
   "license": "MIT",
@@ -30,7 +30,7 @@
     "clean": "node -e \"for(const p of ['dist','homebridge-ui/public/lib'])require('node:fs').rmSync(p,{force:true,recursive:true})\"",
     "prebuild": "npm run clean && npm run build-ui",
     "build": "tsc -p tsconfig.build.json",
-    "build-ui": "homebridge-plugin-utils prepare-ui homebridge-ui/public/lib",
+    "build-ui": "homebridge-plugin-utils prepare-ui homebridge-ui/public/lib && node scripts/prepare-native-loader.mjs",
     "build-docs": "npm run build && homebridge-plugin-utils prepare-docs dist/options.js",
     "check-docs": "homebridge-plugin-utils prepare-docs dist/options.js --check",
     "lint": "eslint --max-warnings=0 eslint.config.mjs src homebridge-ui/server.js homebridge-ui/public/*.mjs",
@@ -46,14 +46,14 @@
     "homebridge-plugin-utils": "2.4.0"
   },
   "devDependencies": {
-    "@eslint/js": "9.39.2",
+    "@eslint/js": "9.39.5",
     "@stylistic/eslint-plugin": "5.10.0",
-    "@types/node": "22.20.4",
+    "@types/node": "22.20.5",
     "eslint": "9.39.2",
     "happy-dom": "21.0.3",
     "homebridge": "2.4.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.70.0"
+    "typescript-eslint": "8.71.2"
   },
   "files": [
     "dist",
@@ -70,7 +70,8 @@
     "examples/*.json",
     "scripts/migrate-config.mjs",
     "README.zh-CN.md",
-    "scripts/install-homebridge-ui-icon.mjs"
+    "scripts/install-homebridge-ui-icon.mjs",
+    "scripts/prepare-native-loader.mjs"
   ],
   "private": true,
   "repository": {

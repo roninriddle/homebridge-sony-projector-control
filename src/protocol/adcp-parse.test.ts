@@ -113,6 +113,8 @@ describe("hashChallenge", () => {
   test("is the lowercase hex SHA-256 of challenge + password", () => {
 
     assert.equal(hashChallenge("a1b2c3", "Projector"), createHash("sha256").update("a1b2c3Projector").digest("hex"));
+    // Independent known-answer vector from Sony's protocol manual, section 4-2-3.
+    assert.equal(hashChallenge("1a2b3c4d", "password1234"), "283121d4374034199c6f08f1a68d1639bfc8eae257fc2e0ac661d65c7e9f0607");
     assert.match(hashChallenge("x", "y"), /^[0-9a-f]{64}$/);
   });
 });

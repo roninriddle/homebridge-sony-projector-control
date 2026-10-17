@@ -46,11 +46,32 @@ button:disabled { opacity:.55; cursor:default; }
 
 .spj-feature-group { margin:10px 0; }
 .spj-feature-group > summary { padding:4px 0; }
-.spj-option { display:grid; grid-template-columns:minmax(0,1fr) 145px; gap:5px 14px; align-items:start; padding:12px 0; }
+.spj-option { display:grid; grid-template-columns:minmax(9rem,1fr) minmax(11.5rem,.9fr); gap:5px 14px; align-items:start; padding:12px 0; }
 .spj-option-description > summary { cursor:pointer; font-weight:500; font-size:.9rem; }
 .spj-option .spj-status { grid-column:2; margin:0; font-size:.76rem; }
 .spj-option-description { grid-row:span 3; }
 .spj-option select { min-height:34px; padding:5px 8px; }
 .spj-removal { margin:16px 0; }
 .spj-removal button { margin-right:8px; }
-@media(max-width:420px) { .spj-option { grid-template-columns:minmax(0,1fr) 115px; } }
+@media(max-width:520px) {
+  .spj-option { grid-template-columns:minmax(0,1fr); gap:8px; }
+  .spj-option-description { grid-row:auto; }
+  .spj-option .spj-status { grid-column:1; }
+}
+.spj-option > select { min-width:0; width:100%; }
+
+
+.spj-option-controls { display:flex; align-items:center; justify-content:flex-end; gap:12px; grid-column:2; }
+.spj-toggle { position:relative; display:inline-flex; width:48px; height:30px; flex:none; cursor:pointer; vertical-align:middle; }
+.spj-toggle input { position:absolute; inset:0; width:100%; height:100%; opacity:0; margin:0; z-index:1; cursor:pointer; }
+.spj-toggle-track { width:48px; height:30px; border-radius:20px; background:#8c96a0; transition:background .18s; }
+.spj-toggle-track::after { content:""; display:block; width:26px; height:26px; border-radius:50%; background:white; margin:2px; box-shadow:0 1px 3px #0003; transition:transform .18s; }
+.spj-toggle input:checked + .spj-toggle-track { background:#248a44; }
+.spj-toggle input:checked + .spj-toggle-track::after { transform:translateX(18px); }
+.spj-toggle input:focus-visible + .spj-toggle-track { outline:3px solid var(--spj-accent); outline-offset:3px; }
+.spj-reset { border:0; padding:5px 0; color:var(--spj-accent); font-size:.8rem; white-space:nowrap; }
+.spj-reset:disabled { opacity:.65; }
+.spj-check-line { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.spj-check-line .spj-check { flex:1; }
+@media(max-width:520px) { .spj-option-controls { grid-column:1; justify-content:flex-start; } }
+@media(prefers-reduced-motion:reduce) { .spj-toggle-track,.spj-toggle-track::after { transition:none; } }

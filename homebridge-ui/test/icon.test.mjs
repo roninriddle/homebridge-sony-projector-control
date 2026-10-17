@@ -22,3 +22,17 @@ test('icon adapter covers every installed-metadata path, preserves backups and i
     assert.throws(()=>execFileSync(process.execPath,[script,root],{stdio:'pipe'}));assert.equal(readFileSync(target,'utf8'),updated);
   }finally{rmSync(root,{recursive:true,force:true});}
 });
+
+test('native loader overlay removes only the obsolete diagnostic and survives a repeated build',()=>{
+  const root=mkdtempSync(join(tmpdir(),'sony-loader-'));
+  try {
+    const path=join(root,'index.html');
+    const html='before\n      if(typeof import.meta.resolve !== "function") {\n old diagnostic\n    } else {\n\n      window.webUiBoot.fail("manifest", error);\n    }\nafter';
+    writeFileSync(path,html);
+    const script=fileURLToPath(new URL('../../scripts/prepare-native-loader.mjs',import.meta.url));
+    execFileSync(process.execPath,[script,path]);const first=readFileSync(path,'utf8');
+    assert.ok(!first.includes('import.meta.resolve'));assert.ok(first.includes('window.webUiBoot.fail("import", error)'));assert.ok(first.includes('window.webUiBoot.fail("manifest", error)'));
+    execFileSync(process.execPath,[script,path]);assert.equal(readFileSync(path,'utf8'),first);
+    writeFileSync(path,'unexpected template');assert.throws(()=>execFileSync(process.execPath,[script,path],{stdio:'pipe'}));assert.equal(readFileSync(path,'utf8'),'unexpected template');
+  }finally{rmSync(root,{recursive:true,force:true});}
+});
