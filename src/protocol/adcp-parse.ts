@@ -158,7 +158,10 @@ export function parseTimer(value: string): number | null {
   return null;
 }
 
-// ADCP authentication: the projector sends a random challenge and expects the lowercase hex SHA-256 of challenge + password. The password never crosses the wire.
+// ADCP wire authentication, not password storage: Sony requires SHA-256(challenge + password).
+// Changing the algorithm would break authenticated projectors. Official protocol manual, section 4-2-3:
+// https://pro.sony/s3/2018/07/03140912/Sony_Protocol-Manual_1st-Edition-Revised-2.pdf
+// See docs/SecurityTriage.md for the narrowly scoped CodeQL false-positive assessment.
 export function hashChallenge(challenge: string, password: string): string {
 
   return createHash("sha256").update(challenge + password).digest("hex");

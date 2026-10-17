@@ -256,20 +256,8 @@
     // original failure already produced.
     if(stage === "import") {
 
-      if(typeof import.meta.resolve !== "function") {
-
-        window.webUiBoot.fail("browser", error);
-      } else {
-
-        try {
-
-          import.meta.resolve("homebridge-plugin-utils/webUi.mjs");
-          window.webUiBoot.fail("import", error);
-        } catch {
-
-          window.webUiBoot.fail("browser", error);
-        }
-      }
+      /* Native UI: no webUi import to probe. */
+      window.webUiBoot.fail("import", error);
     } else {
 
       window.webUiBoot.fail("manifest", error);

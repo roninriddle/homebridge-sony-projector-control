@@ -16,15 +16,15 @@ export const messages = {
     "autoPowerHint": "Off by default. Input, picture and remote actions otherwise leave a standby projector off.",
     "autoPowerOn": "Automatically power on and wait",
     "automations": "Remote, scenes and automations",
-    "backupHelp": "Back up your configuration and pairing data before migration. Stop the old plugin controlling the same project" +
-      "or. Never run unattended lamp-projector power cycles.",
+    "backupHelp": "Back up your configuration and pairing data before migration. Stop the old plugin controlling the same " +
+      "projector. Never run unattended lamp-projector power cycles.",
     "blank": "Picture mute",
     "brightness": "Brightness",
     "busyError": "The projector is warming up or cooling down. Wait and test again.",
     "cancel": "Cancel",
     "cancelledError": "The connection test was cancelled. Please try again.",
-    "capabilityHint": "Test the connection in Settings to discover this model's supported features. Global settings apply to each pro" +
-      "jector's capabilities.",
+    "capabilityHint": "Test the connection in Settings to discover this model's supported features. Global settings apply to each " +
+      "projector's capabilities.",
     "categories": {
 
       "Aspect": "Aspect ratios",
@@ -77,6 +77,7 @@ export const messages = {
     "id": "Stable device ID",
     "idHint": "Keep this unchanged to preserve accessory identity, even when the address changes.",
     "inherit": "Use inherited / default setting",
+    "inheritGlobal": "Inherit global",
     "inputSource": "TV input picker",
     "inputs": "Input tokens",
     "intro": "Sony ADCP / PJ Talk control, with optional picture controls and automation sensors.",
@@ -182,8 +183,8 @@ export const messages = {
     "pairingHelp": "Run this plugin on a child bridge. In Apple Home, add the child bridge and each separately published TV using " +
       "Add Accessory → More Options.",
     "password": "Administrator password",
-    "passwordHint": "Default: Projector. For passwordless ADCP, turn off Requires Authentication in the projector's web settings. T" +
-      "he plugin detects authentication automatically.",
+    "passwordHint": "Default: Projector. For passwordless ADCP, turn off Requires Authentication in the projector's web settings. " +
+      "The plugin detects authentication automatically.",
     "pictureModes": "Picture modes",
     "platformName": "Platform name",
     "pollInterval": "Poll interval (seconds)",
@@ -200,6 +201,7 @@ export const messages = {
     "remove": "Remove this projector",
     "removeConfirm": "Remove this projector from the configuration? Save to apply.",
     "report": "Report a problem",
+    "restoreDefault": "Reset",
     "save": "Save settings",
     "saveError": "Could not save settings. Your edits are kept here; try again.",
     "saved": "Settings saved. Restart the plugin child bridge to apply device changes.",
@@ -207,17 +209,17 @@ export const messages = {
     "scope": "Apply to",
     "sdcp": "SDCP / PJ Talk",
     "security": "Projector security",
-    "sensorHelp": "Ready follows the reported running state; it does not guarantee an HDMI picture. Warming and Cooling use obser" +
-      "ved device states. Offline sensors are unavailable.",
+    "sensorHelp": "Ready follows the reported running state; it does not guarantee an HDMI picture. Warming and Cooling use " +
+      "observed device states. Offline sensors are unavailable.",
     "settings": "Settings",
-    "setupHelp": "Enable Remote Start / Network Management and ADCP (or PJ Talk) on the projector, and reserve a fixed IP addres" +
-      "s.",
+    "setupHelp": "Enable Remote Start / Network Management and ADCP (or PJ Talk) on the projector, and reserve a fixed IP " +
+      "address.",
     "showPassword": "Show password",
     "standby": "Standby",
     "supported": "Supported",
     "test": "Test connection",
-    "testHint": "Tests the values currently entered below, including unsaved changes. It does not turn on the projector or save" +
-      " settings.",
+    "testHint": "Tests the values currently entered below, including unsaved changes. It does not turn on the projector or " +
+      "save settings.",
     "testPatterns": "Test-pattern tokens",
     "testing": "Connecting…",
     "title": "Sony Projector Control",
@@ -226,6 +228,7 @@ export const messages = {
     "unknown": "Unknown",
     "unsaved": "Unsaved changes",
     "unsupported": "Not supported",
+    "useDefault": "Use default",
     "username": "Administrator username",
     "validationCommunity": "SDCP community must contain four printable characters.",
     "validationDuplicate": "Each projector must have a unique address and stable ID.",
@@ -312,6 +315,7 @@ export const messages = {
     "id": "固定设备标识",
     "idHint": "设置后请保持不变；更换地址时也不更改，以保留配件身份。",
     "inherit": "继承全局／使用默认值",
+    "inheritGlobal": "跟随全局",
     "inputSource": "电视输入列表",
     "inputs": "输入命令值",
     "intro": "索尼 ADCP／PJ Talk 投影仪控制，可按需启用画面调节和自动化传感器。",
@@ -433,6 +437,7 @@ export const messages = {
     "remove": "移除此投影仪",
     "removeConfirm": "从配置中移除此投影仪？保存后生效。",
     "report": "反馈问题",
+    "restoreDefault": "恢复默认",
     "save": "保存设置",
     "saveError": "保存失败，填写内容已保留，请重试。",
     "saved": "设置已保存。设备设置修改后，请重启本插件子桥使其生效。",
@@ -456,6 +461,7 @@ export const messages = {
     "unknown": "未知",
     "unsaved": "有尚未保存的修改",
     "unsupported": "不支持",
+    "useDefault": "使用默认",
     "username": "管理员用户名",
     "validationCommunity": "SDCP 群组码须为 4 个可打印字符。",
     "validationDuplicate": "每台投影仪的地址和固定标识必须各自唯一。",

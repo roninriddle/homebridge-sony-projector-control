@@ -291,19 +291,38 @@ function choiceField(p, key, items, fallback, hint, targetKey = key) {
   return wrapper;
 }
 
-function checkField(p, key, hint) {
+function switchControl(label, checked, change, id) {
 
+  const wrapper = node("label", undefined, "spj-toggle");
   const input = node("input");
 
   input.type = "checkbox";
-  input.checked = p[key] === true;
-  listen(input, "change", () => changed(p, key, input.checked, input));
+  input.id = id;
+  input.checked = checked;
+  input.setAttribute("role", "switch");
+  input.setAttribute("aria-label", label);
+  const track = node("span", undefined, "spj-toggle-track");
+
+  track.setAttribute("aria-hidden", "true");
+  listen(input, "change", () => change(input.checked, input));
+  wrapper.append(input, track);
+
+  return wrapper;
+}
+
+function checkField(p, key, hint) {
+
+  const toggle = switchControl(t(key), p[key] === true, (checked, input) => changed(p, key, checked, input), "setting-" + key);
   const label = node("label", undefined, "spj-check");
 
-  label.append(input, node("span", t(key)));
+  label.htmlFor = "setting-" + key;
+  label.append(node("span", t(key)));
   const wrapper = node("div");
 
-  wrapper.append(label);
+  const line = node("div", undefined, "spj-check-line");
+
+  line.append(label, toggle);
+  wrapper.append(line);
 
   if(hint) {
 
@@ -632,8 +651,13 @@ function renderFeatures(body) {
       };
       const state = !engine.exists(key, scope || undefined) ? "inherit" : on ? "enabled" : "disabled";
 
-      row.append(select([ [ "inherit", t("inherit") ], [ "enabled", t("enabled") ], [ "disabled", t("disabled") ] ], state, copy[0],
-        value => set(value), "option-" + key));
+      const controls = node("div", undefined, "spj-option-controls");
+      const reset = button(t("restoreDefault"), () => set("inherit"), "spj-reset");
+
+      reset.id = "reset-" + key;
+      reset.disabled = state === "inherit";
+      controls.append(switchControl(copy[0], on, checked => set(checked ? "enabled" : "disabled"), "option-" + key), reset);
+      row.append(controls);
 
       if(Array.isArray(option.choices)) {
 
@@ -642,7 +666,8 @@ function renderFeatures(body) {
         row.append(select(option.choices.map(c => [ String(c.value), messages[language].choices[c.value] || c.label ]), String(value),
           copy[0] + " " + t("effectiveValue"), selectedValue => set("enabled", selectedValue), "value-" + key));
       }
-      row.append(node("p", t(on ? "effectiveOn" : "effectiveOff"), "spj-status"));
+      row.append(node("p", (state === "inherit" ? t(scope ? "inheritGlobal" : "useDefault") + " · " : "") +
+        t(on ? "effectiveOn" : "effectiveOff"), "spj-status"));
       section.append(row);
     }
 

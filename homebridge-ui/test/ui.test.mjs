@@ -53,9 +53,18 @@ test('host language selects Chinese, feature groups fold and disabled remote hid
     assert.equal(p.document.documentElement.lang,'zh-CN');
     p.document.querySelector('#menu-features').click();
     const groups=[...p.document.querySelectorAll('.spj-feature-group')];assert.ok(groups.length>4);assert.ok(groups.every(g=>!g.open));
+    assert.equal(p.document.querySelector('#option-Remote').type,'checkbox');
+    assert.equal(p.document.querySelector('#option-Remote').getAttribute('role'),'switch');
+    assert.equal(p.document.querySelector('#option-Remote').checked,false);
+    assert.equal(p.document.querySelector('#reset-Remote').disabled,false);
     assert.ok(p.document.querySelector('#option-Remote'));assert.equal(p.document.querySelector('[id="option-Remote.Back"]'),null);
-    const remote=p.document.querySelector('#option-Remote');remote.value='enabled';remote.dispatchEvent(new window.Event('change'));await p.flush();
+    const remote=p.document.querySelector('#option-Remote');remote.checked=true;remote.dispatchEvent(new window.Event('change'));await p.flush();
     assert.ok(p.document.querySelector('[id="option-Remote.Back"]'));
+    const scope=p.document.querySelector('#featureScope');scope.value=scope.options[1].value;scope.dispatchEvent(new window.Event('change'));await p.flush();
+    p.document.querySelector('#reset-Remote').click();await p.flush();
+    assert.equal(p.document.querySelector('#reset-Remote').disabled,true);
+    assert.ok(p.document.body.textContent.includes('跟随全局'));
+    assert.equal(p.document.querySelector('#option-Remote').checked,true);
     p.document.querySelector('#menu-help').click();assert.ok(p.document.querySelector('a[href*="Troubleshooting.zh-CN.md"]'));
   } finally {await p.close();}
 });
